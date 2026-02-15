@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AngelCare — Live Monitor</title>
+<script>if(sessionStorage.getItem('angelcare_auth')!=='ok')window.location.href='login.html';</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand: 220 80% 58%;
+    --bg: #fafbff;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --text-faint: #94a3b8;
+    --border: #e2e8f0;
+    --card-bg: #ffffff;
+    --critical: #dc2626;
+    --critical-bg: #fef2f2;
+    --high: #ea580c;
+    --high-bg: #fff7ed;
+    --medium: #ca8a04;
+    --medium-bg: #fefce8;
+    --safe: #16a34a;
+    --safe-bg: #f0fdf4;
+    --radius: 12px;
+    --blue-300: #93c5fd;
+    --blue-400: #60a5fa;
+    --blue-500: #3b82f6;
+    --indigo-300: #a5b4fc;
+    --violet-200: #ddd6fe;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Aurora ──────────────────────────── */
+  .aurora-wrapper {
+    position: fixed; inset: 0; overflow: hidden;
+    pointer-events: none; z-index: 0;
+  }
+
+  .aurora {
+    position: absolute; inset: -10px;
+    opacity: 0.45; filter: blur(10px);
+    background-image:
+      repeating-linear-gradient(100deg, #fff 0%, #fff 5%, transparent 8%, transparent 11%, #fff 15%),
+      repeating-linear-gradient(100deg, var(--blue-500) 10%, var(--indigo-300) 15%, var(--blue-300) 20%, var(--violet-200) 25%, var(--blue-400) 30%);
+    background-size: 300% 200%;
+    animation: aurora 45s linear infinite;
+    mask-image: radial-gradient(ellipse at 50% 20%, black 15%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse at 50% 20%, black 15%, transparent 70%);
+  }
+
+  .aurora::after {
+    content: ""; position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(100deg, #fff 0%, #fff 7%, transparent 10%, transparent 12%, #fff 16%),
+      repeating-linear-gradient(100deg, var(--blue-500) 10%, var(--indigo-300) 15%, var(--blue-300) 20%, var(--violet-200) 25%, var(--blue-400) 30%);
+    background-size: 200% 100%; background-attachment: fixed;
+    animation: aurora 60s linear infinite; mix-blend-mode: difference;
+  }
+
+  @keyframes aurora {
+    from { background-position: 50% 50%, 50% 50%; }
+    to   { background-position: 350% 50%, 350% 50%; }
+  }
+
+  /* ── Nav ─────────────────────────────── */
+  nav {
+    position: relative; z-index: 10;
+    padding: 16px 32px;
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  nav a { text-decoration: none; display: flex; align-items: center; }
+
+  .nav-logo {
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .nav-logo img {
+    height: 28px;
+    mix-blend-mode: multiply;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.06));
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+
+  .nav-logo span {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #2c2417;
+    letter-spacing: 0.3px;
+  }
+
+  nav .back {
+    font-size: 13px; font-weight: 400; color: var(--text-faint);
+    margin-left: auto; display: flex; align-items: center; gap: 4px;
+    transition: color 0.15s;
+  }
+  nav .back:hover { color: var(--text-muted); }
+  nav .back svg { width: 14px; height: 14px; }
+
+  /* ── Dashboard layout ────────────────── */
+  .dashboard {
+    position: relative; z-index: 1;
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 8px 32px 80px;
+    animation: appear-up 0.6s ease-out;
+  }
+
+  @keyframes appear-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Event feed (left) ─────────────── */
+  .feed-panel h1 {
+    font-size: 18px; font-weight: 600;
+    letter-spacing: -0.02em; margin-bottom: 4px;
+  }
+
+  .feed-panel .subtitle {
+    font-size: 13px; color: var(--text-faint);
+    margin-bottom: 16px; line-height: 1.5;
+  }
+
+  .status-bar {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 16px; padding: 10px 14px;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid var(--border);
+    border-radius: 10px; font-size: 13px;
+  }
+
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--text-faint);
+  }
+
+  .status-dot.connected {
+    background: var(--safe);
+    box-shadow: 0 0 6px var(--safe);
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .status-dot.error {
+    background: var(--critical);
+  }
+
+  .status-text { color: var(--text-muted); }
+
+  .event-feed {
+    display: flex; flex-direction: column; gap: 6px;
+    max-height: calc(100vh - 260px);
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  .event-feed::-webkit-scrollbar { width: 4px; }
+  .event-feed::-webkit-scrollbar-thumb {
+    background: var(--border); border-radius: 4px;
+  }
+
+  .event-item {
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    animation: appear-up 0.3s ease-out;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .event-item:hover {
+    border-color: hsl(var(--brand) / 0.3);
+    background: rgba(255,255,255,0.9);
+  }
+
+  .event-item.active {
+    border-color: hsl(var(--brand) / 0.4);
+    background: hsl(var(--brand) / 0.04);
+    box-shadow: 0 0 0 1px hsl(var(--brand) / 0.1);
+  }
+
+  .event-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  }
+
+  .dot-CRITICAL { background: var(--critical); box-shadow: 0 0 6px var(--critical); }
+  .dot-HIGH     { background: var(--high); box-shadow: 0 0 6px var(--high); }
+  .dot-MEDIUM   { background: var(--medium); }
+  .dot-SAFE     { background: var(--safe); }
+
+  .event-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--text-faint);
+  }
+
+  .event-badge {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.4px; padding: 2px 6px; border-radius: 5px;
+    margin-left: auto;
+  }
+
+  .event-badge-CRITICAL { background: var(--critical-bg); color: var(--critical); }
+  .event-badge-HIGH     { background: var(--high-bg); color: var(--high); }
+  .event-badge-MEDIUM   { background: var(--medium-bg); color: var(--medium); }
+  .event-badge-SAFE     { background: var(--safe-bg); color: var(--safe); }
+
+  .model-tag {
+    font-size: 9px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.5px; padding: 1px 5px; border-radius: 4px;
+    background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;
+  }
+
+  .model-tag.deferred {
+    background: #ede9fe; color: #6d28d9; border-color: #ddd6fe;
+  }
+
+  .cascade-bar {
+    display: none; align-items: center; gap: 8px;
+    margin-bottom: 12px; padding: 8px 12px;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid var(--border);
+    border-radius: 8px; font-size: 12px; color: var(--text-muted);
+  }
+
+  .cascade-bar.visible { display: flex; }
+
+  .cascade-stat {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 500;
+  }
+
+  .event-text {
+    font-size: 13px; color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .empty-feed {
+    text-align: center; padding: 40px 20px;
+    color: var(--text-faint); font-size: 14px;
+  }
+
+  .empty-feed svg { width: 28px; height: 28px; opacity: 0.4; margin-bottom: 8px; }
+
+  /* ── Camera connection ─────────────── */
+  .camera-panel {
+    background: rgba(255,255,255,0.7);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+  }
+
+  .camera-panel h3 {
+    font-size: 14px; font-weight: 600;
+    margin-bottom: 10px; letter-spacing: -0.01em;
+  }
+
+  .camera-form {
+    display: flex; gap: 8px; margin-bottom: 10px;
+  }
+
+  .camera-form input[type="text"] {
+    flex: 1; padding: 8px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px; outline: none;
+    background: white;
+    transition: border-color 0.15s;
+  }
+
+  .camera-form input[type="text"]:focus {
+    border-color: hsl(var(--brand) / 0.5);
+  }
+
+  .camera-form input[type="text"]::placeholder {
+    color: var(--text-faint);
+  }
+
+  .cam-btn {
+    padding: 8px 16px;
+    font-size: 12px; font-weight: 600;
+    border: none; border-radius: 8px;
+    cursor: pointer; transition: all 0.15s;
+  }
+
+  .cam-btn-start {
+    background: hsl(var(--brand));
+    color: white;
+  }
+
+  .cam-btn-start:hover { opacity: 0.9; }
+
+  .cam-btn-stop {
+    background: var(--critical-bg);
+    color: var(--critical);
+  }
+
+  .cam-btn-stop:hover { background: #fde8e8; }
+
+  .camera-status {
+    font-size: 12px; color: var(--text-muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .camera-status .cam-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--text-faint);
+  }
+
+  .camera-status .cam-dot.recording {
+    background: var(--critical);
+    animation: pulse-glow 1.5s ease-in-out infinite;
+  }
+
+  /* ── Main panel (right) ────────────── */
+  .main-panel {
+    display: flex; flex-direction: column; gap: 20px;
+  }
+
+  /* Upload area */
+  .upload-area {
+    padding: 32px;
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(12px);
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .upload-area:hover {
+    border-color: hsl(var(--brand) / 0.4);
+    background: rgba(255,255,255,0.8);
+  }
+
+  .upload-area.dragging {
+    border-color: hsl(var(--brand));
+    background: hsl(var(--brand) / 0.04);
+  }
+
+  .upload-area svg { width: 32px; height: 32px; color: var(--text-faint); margin-bottom: 8px; }
+  .upload-area p { font-size: 14px; color: var(--text-muted); }
+  .upload-area .hint { font-size: 12px; color: var(--text-faint); margin-top: 4px; }
+
+  .upload-area input[type="file"] { display: none; }
+
+  /* Processing indicator */
+  .processing {
+    display: none; align-items: center; gap: 10px;
+    padding: 14px 18px;
+    background: hsl(var(--brand) / 0.04);
+    border: 1px solid hsl(var(--brand) / 0.15);
+    border-radius: 10px;
+    font-size: 13px; color: var(--text-muted);
+  }
+
+  .processing.visible { display: flex; }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: hsl(var(--brand));
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Analysis card */
+  .analysis-card {
+    display: none;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    animation: appear-up 0.4s ease-out;
+  }
+
+  .analysis-card.visible { display: block; }
+
+  .analysis-card-accent { height: 3px; width: 100%; }
+
+  .accent-CRITICAL { background: var(--critical); }
+  .accent-HIGH     { background: var(--high); }
+  .accent-MEDIUM   { background: var(--medium); }
+  .accent-SAFE     { background: var(--safe); }
+
+  .analysis-inner { padding: 24px; }
+
+  .analysis-top {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .analysis-top h2 {
+    font-size: 17px; font-weight: 600; letter-spacing: -0.01em;
+  }
+
+  .badge {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.5px; padding: 3px 8px; border-radius: 6px;
+  }
+
+  .badge-CRITICAL { background: var(--critical-bg); color: var(--critical); }
+  .badge-HIGH     { background: var(--high-bg); color: var(--high); }
+  .badge-MEDIUM   { background: var(--medium-bg); color: var(--medium); }
+  .badge-SAFE     { background: var(--safe-bg); color: var(--safe); }
+
+  .analysis-description {
+    font-size: 14px; color: var(--text-muted);
+    line-height: 1.7; margin-bottom: 20px;
+  }
+
+  .action-bar {
+    padding: 12px; border-radius: 8px;
+  }
+
+  .action-bar.risk { background: var(--critical-bg); }
+  .action-bar.safe { background: var(--safe-bg); }
+
+  .meta-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    color: var(--text-faint); margin-bottom: 4px;
+  }
+
+  .meta-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; font-weight: 500;
+  }
+
+  .meta-value.risk { color: var(--critical); }
+  .meta-value.safe { color: var(--safe); }
+
+  /* ── Footer ──────────────────────────── */
+  .powered-by {
+    text-align: center; font-size: 12px;
+    color: var(--text-faint); line-height: 1.6;
+    padding-top: 4px;
+  }
+
+  .powered-by strong { font-weight: 500; color: var(--text-muted); }
+
+  /* ── Alert banner ────────────────────── */
+  .alert-banner {
+    display: none; position: fixed;
+    top: 0; left: 0; right: 0; z-index: 100;
+    padding: 12px 24px;
+    background: var(--critical);
+    color: white; font-weight: 500;
+    text-align: center; font-size: 14px;
+    animation: slide-down 0.3s ease-out;
+  }
+
+  .alert-banner.visible { display: block; }
+
+  @keyframes slide-down {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+  }
+
+  /* ── Pulse ───────────────────────────── */
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .dot-CRITICAL, .dot-HIGH {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* ── Responsive ──────────────────────── */
+  @media (max-width: 768px) {
+    .dashboard {
+      grid-template-columns: 1fr;
+      padding: 8px 16px 80px;
+    }
+    .event-feed { max-height: 300px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="aurora-wrapper">
+  <div class="aurora"></div>
+</div>
+
+<div class="alert-banner" id="alertBanner"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo"><img src="angel_logo2.png" alt="AngelCare"><span>AngelCare</span></a>
+  <a href="examples.html" class="back" style="margin-left: auto; margin-right: 8px;">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+    Test Videos
+  </a>
+  <a href="index.html" class="back">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
+    Home
+  </a>
+</nav>
+
+<div class="dashboard">
+  <!-- Left: event feed -->
+  <div class="feed-panel">
+    <h1>Live Monitor</h1>
+    <p class="subtitle">Real-time safety analysis powered by NVIDIA VSS.</p>
+
+    <div class="status-bar">
+      <span class="status-dot" id="statusDot"></span>
+      <span class="status-text" id="statusText">Checking VSS connection...</span>
+    </div>
+
+    <div class="cascade-bar" id="cascadeBar">
+      <span>Cascade</span>
+      <span class="cascade-stat" id="cascadeStats"></span>
+    </div>
+
+    <div class="event-feed" id="eventFeed">
+      <div class="empty-feed" id="emptyFeed">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+        <p>No events yet. Upload a video to begin.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: upload + analysis -->
+  <div class="main-panel">
+    <!-- Backend connection -->
+    <div class="camera-panel" id="backendPanel">
+      <h3>Backend Connection</h3>
+      <div class="camera-form" id="backendForm">
+        <input type="text" id="backendUrl" placeholder="https://your-tunnel-url.trycloudflare.com" style="flex:1">
+        <button class="cam-btn cam-btn-start" onclick="connectBackend()">Connect</button>
+      </div>
+      <div class="camera-status" id="backendStatus">
+        <span class="cam-dot" id="backendDot"></span>
+        <span id="backendStatusText">Not connected — enter your Nebius tunnel URL</span>
+      </div>
+    </div>
+
+    <!-- Camera connection -->
+    <div class="camera-panel" id="cameraPanel">
+      <h3>Camera Connection</h3>
+      <div class="camera-form" id="cameraForm">
+        <input type="text" id="rtspUrl" placeholder="rtsp://user:pass@localhost:8554/stream1">
+        <button class="cam-btn cam-btn-start" id="camStartBtn" onclick="startCamera()">Start</button>
+        <button class="cam-btn cam-btn-stop" id="camStopBtn" onclick="stopCamera()" style="display:none">Stop</button>
+      </div>
+      <div class="camera-status" id="cameraStatus">
+        <span class="cam-dot" id="camDot"></span>
+        <span id="camStatusText">Not connected</span>
+      </div>
+    </div>
+
+    <div class="upload-area" id="uploadArea">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" /></svg>
+      <p>Drop a video here or click to upload</p>
+      <p class="hint">MP4, MOV, AVI — analyzed by Cosmos Reason 2 (+ Nemotron VL cascade)</p>
+      <input type="file" id="fileInput" accept="video/*">
+    </div>
+
+    <div class="processing" id="processing">
+      <div class="spinner"></div>
+      <span>Analyzing video with VSS (Cosmos Reason 2)...</span>
+    </div>
+
+    <div class="analysis-card" id="analysisCard">
+      <div class="analysis-card-accent" id="cardAccent"></div>
+      <div class="analysis-inner">
+        <video id="clipPlayer" style="width:100%;border-radius:8px;margin-bottom:12px;display:none" controls muted></video>
+        <div class="analysis-top">
+          <h2 id="analysisTitle">Analysis</h2>
+          <span class="badge" id="riskTag"></span>
+        </div>
+        <p class="analysis-description" id="analysisSummary"></p>
+        <div class="action-bar" id="actionBar">
+          <div class="meta-label">Recommended Action</div>
+          <div class="meta-value" id="actionText"></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="powered-by">
+      Powered by <strong>NVIDIA VSS</strong> &mdash; Cosmos Reason 2 + Nemotron VL speculative cascade on GPU.
+    </p>
+  </div>
+</div>
+
+<script>
+// ── Config ──────────────────────────────────────────────
+// Backend URL — either local Flask or remote Nebius via Cloudflare Tunnel
+let API_BASE = localStorage.getItem('angelcare_backend') || window.location.origin;
+
+// Restore saved backend URL
+const backendInput = document.getElementById('backendUrl');
+if (localStorage.getItem('angelcare_backend')) {
+  backendInput.value = localStorage.getItem('angelcare_backend');
+}
+
+function connectBackend() {
+  const url = backendInput.value.trim().replace(/\/+$/, '');
+  if (!url) { alert('Enter a backend URL'); return; }
+  API_BASE = url;
+  localStorage.setItem('angelcare_backend', url);
+  checkHealth();
+}
+
+function updateBackendStatus(ok) {
+  const dot = document.getElementById('backendDot');
+  const text = document.getElementById('backendStatusText');
+  if (ok) {
+    dot.classList.add('connected');
+    dot.classList.remove('error');
+    text.textContent = 'Connected to ' + API_BASE;
+  } else {
+    dot.classList.add('error');
+    dot.classList.remove('connected');
+    text.textContent = 'Cannot reach backend';
+  }
+}
+
+// ── DOM refs ────────────────────────────────────────────
+const uploadArea = document.getElementById('uploadArea');
+const fileInput = document.getElementById('fileInput');
+const processing = document.getElementById('processing');
+const analysisCard = document.getElementById('analysisCard');
+const eventFeed = document.getElementById('eventFeed');
+const emptyFeed = document.getElementById('emptyFeed');
+const statusDot = document.getElementById('statusDot');
+const statusText = document.getElementById('statusText');
+const alertBanner = document.getElementById('alertBanner');
+const cascadeBar = document.getElementById('cascadeBar');
+const cascadeStatsEl = document.getElementById('cascadeStats');
+
+// ── State ───────────────────────────────────────────────
+let events = [];
+let pollTimer = null;
+let cascadeEnabled = false;
+
+// ── VSS health check ───────────────────────────────────
+async function checkHealth() {
+  try {
+    const resp = await fetch(`${API_BASE}/api/vss/health`);
+    if (resp.ok) {
+      statusDot.classList.add('connected');
+      statusDot.classList.remove('error');
+      statusText.textContent = 'VSS connected';
+      updateBackendStatus(true);
+      return true;
+    }
+  } catch (e) {}
+  // Try camera/status as fallback (works without VSS)
+  try {
+    const resp = await fetch(`${API_BASE}/api/camera/status`);
+    if (resp.ok) {
+      statusDot.classList.add('connected');
+      statusDot.classList.remove('error');
+      statusText.textContent = 'Backend connected (no VSS)';
+      updateBackendStatus(true);
+      return true;
+    }
+  } catch (e) {}
+  statusDot.classList.add('error');
+  statusDot.classList.remove('connected');
+  statusText.textContent = 'Backend not reachable — enter tunnel URL above';
+  updateBackendStatus(false);
+  return false;
+}
+
+checkHealth();
+setInterval(checkHealth, 30000);
+
+// ── Cascade stats ───────────────────────────────────────
+async function checkCascade() {
+  try {
+    const resp = await fetch(`${API_BASE}/api/cascade/stats`);
+    if (!resp.ok) return;
+    const data = await resp.json();
+    if (data.enabled) {
+      cascadeEnabled = true;
+      cascadeBar.classList.add('visible');
+      const rate = (data.deferral_rate * 100).toFixed(0);
+      cascadeStatsEl.textContent = `${data.total} clips | ${data.deferred} deferred (${rate}%)`;
+    }
+  } catch (e) {}
+}
+
+checkCascade();
+setInterval(checkCascade, 15000);
+
+// ── Upload handling ─────────────────────────────────────
+uploadArea.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', (e) => {
+  if (e.target.files.length) handleUpload(e.target.files[0]);
+});
+
+uploadArea.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  uploadArea.classList.add('dragging');
+});
+
+uploadArea.addEventListener('dragleave', () => {
+  uploadArea.classList.remove('dragging');
+});
+
+uploadArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadArea.classList.remove('dragging');
+  if (e.dataTransfer.files.length) handleUpload(e.dataTransfer.files[0]);
+});
+
+async function handleUpload(file) {
+  processing.classList.add('visible');
+  analysisCard.classList.remove('visible');
+
+  try {
+    // Upload and analyze in one step (works with cascade, local model, or VSS)
+    const formData = new FormData();
+    formData.append('video', file);
+    const resp = await fetch(`${API_BASE}/api/analyze`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error || 'Analysis failed');
+    }
+    const result = await resp.json();
+
+    // Display result
+    showAnalysis(result);
+    addEvent(result);
+
+  } catch (err) {
+    console.error('Upload error:', err);
+    processing.classList.remove('visible');
+    alert('Analysis failed: ' + err.message);
+  }
+}
+
+// ── Display analysis card ───────────────────────────────
+function showAnalysis(result) {
+  processing.classList.remove('visible');
+
+  const risk = result.risk_level || 'SAFE';
+  const summary = result.summary || result.video_description || 'No description available.';
+
+  // Show clip video if available
+  const clipPlayer = document.getElementById('clipPlayer');
+  if (result.clip_url) {
+    clipPlayer.src = API_BASE + result.clip_url;
+    clipPlayer.style.display = 'block';
+    clipPlayer.load();
+  } else {
+    clipPlayer.style.display = 'none';
+  }
+
+  document.getElementById('cardAccent').className = `analysis-card-accent accent-${risk}`;
+
+  const tag = document.getElementById('riskTag');
+  tag.textContent = risk;
+  tag.className = `badge badge-${risk}`;
+
+  document.getElementById('analysisSummary').textContent = summary;
+
+  // Show model attribution if available
+  const modelName = result.model || '';
+  const wasDeferred = result.deferred || false;
+  const titleSuffix = wasDeferred ? ` · verified by ${modelName}` : (modelName ? ` · ${modelName}` : '');
+  document.getElementById('analysisTitle').textContent =
+    (risk === 'SAFE' ? 'All Clear' : 'Alert') + titleSuffix;
+
+  const isRisk = ['CRITICAL', 'HIGH', 'MEDIUM'].includes(risk);
+  const actionBar = document.getElementById('actionBar');
+  actionBar.className = `action-bar ${isRisk ? 'risk' : 'safe'}`;
+
+  const actionText = document.getElementById('actionText');
+  actionText.className = `meta-value ${isRisk ? 'risk' : 'safe'}`;
+  actionText.textContent = isRisk
+    ? (risk === 'CRITICAL' ? 'Call emergency services immediately' : 'Alert caregiver — monitor closely')
+    : 'No action needed';
+
+  analysisCard.classList.add('visible');
+
+  // Flash alert banner for CRITICAL
+  if (risk === 'CRITICAL') {
+    alertBanner.textContent = `CRITICAL — ${summary.slice(0, 120)}`;
+    alertBanner.classList.add('visible');
+    setTimeout(() => alertBanner.classList.remove('visible'), 8000);
+
+    // Browser notification
+    if (Notification.permission === 'granted') {
+      new Notification('AngelCare — CRITICAL ALERT', { body: summary.slice(0, 200) });
+    } else if (Notification.permission !== 'denied') {
+      Notification.requestPermission();
+    }
+  }
+}
+
+// ── Event feed ──────────────────────────────────────────
+function addEvent(result) {
+  emptyFeed.style.display = 'none';
+
+  const risk = result.risk_level || 'SAFE';
+  const summary = result.summary || result.video_description || 'No description.';
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+  const model = result.model || '';
+  const deferred = result.deferred || false;
+  const modelTag = model
+    ? `<span class="model-tag${deferred ? ' deferred' : ''}">${deferred ? '↗ ' + model : model}</span>`
+    : '';
+
+  const el = document.createElement('div');
+  el.className = 'event-item';
+  el.innerHTML = `
+    <div class="event-header">
+      <span class="dot dot-${risk}"></span>
+      <span class="event-time">${timeStr}</span>
+      ${modelTag}
+      <span class="event-badge event-badge-${risk}">${risk}</span>
+    </div>
+    <div class="event-text">${escapeHtml(summary)}</div>
+  `;
+
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.event-item').forEach(e => e.classList.remove('active'));
+    el.classList.add('active');
+    showAnalysis(result);
+  });
+
+  // Insert at top
+  eventFeed.insertBefore(el, eventFeed.firstChild);
+  events.unshift({ result, time: now });
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ── Poll for new events (when livestream is active) ─────
+async function pollEvents() {
+  try {
+    const resp = await fetch(`${API_BASE}/api/vss/events`);
+    if (!resp.ok) return;
+    const data = await resp.json();
+    if (data.events && data.events.length) {
+      data.events.forEach(evt => {
+        addEvent(evt);
+        showAnalysis(evt);
+      });
+    }
+  } catch (e) {}
+}
+
+// Poll every 15 seconds for new events from the backend
+pollTimer = setInterval(pollEvents, 15000);
+
+// ── Camera controls ─────────────────────────────────────
+const camStartBtn = document.getElementById('camStartBtn');
+const camStopBtn = document.getElementById('camStopBtn');
+const camDot = document.getElementById('camDot');
+const camStatusText = document.getElementById('camStatusText');
+const rtspInput = document.getElementById('rtspUrl');
+
+async function startCamera() {
+  const rtspUrl = rtspInput.value.trim();
+  if (!rtspUrl) { alert('Enter an RTSP URL'); return; }
+
+  camStartBtn.disabled = true;
+  camStartBtn.textContent = 'Connecting...';
+
+  try {
+    const resp = await fetch(`${API_BASE}/api/camera/start`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rtsp_url: rtspUrl }),
+    });
+    const data = await resp.json();
+
+    if (resp.ok && data.status === 'started') {
+      setCameraUI(true, data);
+    } else {
+      alert('Failed to start camera: ' + (data.error || 'Unknown error'));
+      camStartBtn.disabled = false;
+      camStartBtn.textContent = 'Start';
+    }
+  } catch (e) {
+    alert('Camera start failed: ' + e.message);
+    camStartBtn.disabled = false;
+    camStartBtn.textContent = 'Start';
+  }
+}
+
+async function stopCamera() {
+  try {
+    await fetch(`${API_BASE}/api/camera/stop`, { method: 'POST' });
+  } catch (e) {}
+  setCameraUI(false);
+}
+
+function setCameraUI(running, data) {
+  if (running) {
+    camStartBtn.style.display = 'none';
+    camStopBtn.style.display = 'inline-block';
+    rtspInput.disabled = true;
+    camDot.classList.add('recording');
+    const clips = data && data.clips_captured ? data.clips_captured : 0;
+    camStatusText.textContent = `Recording — ${clips} clips captured`;
+  } else {
+    camStartBtn.style.display = 'inline-block';
+    camStartBtn.disabled = false;
+    camStartBtn.textContent = 'Start';
+    camStopBtn.style.display = 'none';
+    rtspInput.disabled = false;
+    camDot.classList.remove('recording');
+    camStatusText.textContent = 'Not connected';
+  }
+}
+
+// Poll camera status every 10 seconds
+async function pollCameraStatus() {
+  try {
+    const resp = await fetch(`${API_BASE}/api/camera/status`);
+    if (!resp.ok) return;
+    const data = await resp.json();
+    if (data.running) {
+      setCameraUI(true, data);
+    }
+  } catch (e) {}
+}
+
+pollCameraStatus();
+setInterval(pollCameraStatus, 10000);
+</script>
+
+</body>
+</html>

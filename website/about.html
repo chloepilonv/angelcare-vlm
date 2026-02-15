@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AngelCare — About</title>
+<script>if(sessionStorage.getItem('angelcare_auth')!=='ok')window.location.href='login.html';</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand: 220 80% 58%;
+    --bg: #fafbff;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --text-faint: #94a3b8;
+    --border: #e2e8f0;
+    --blue-300: #93c5fd;
+    --blue-400: #60a5fa;
+    --blue-500: #3b82f6;
+    --indigo-300: #a5b4fc;
+    --violet-200: #ddd6fe;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Aurora ──────────────────────────── */
+  .aurora-wrapper {
+    position: fixed; inset: 0; overflow: hidden;
+    pointer-events: none; z-index: 0;
+  }
+
+  .aurora {
+    position: absolute; inset: -10px;
+    opacity: 0.45; filter: blur(10px);
+    background-image:
+      repeating-linear-gradient(100deg, #fff 0%, #fff 5%, transparent 8%, transparent 11%, #fff 15%),
+      repeating-linear-gradient(100deg, var(--blue-500) 10%, var(--indigo-300) 15%, var(--blue-300) 20%, var(--violet-200) 25%, var(--blue-400) 30%);
+    background-size: 300% 200%;
+    animation: aurora 45s linear infinite;
+    mask-image: radial-gradient(ellipse at 50% 20%, black 15%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse at 50% 20%, black 15%, transparent 70%);
+  }
+
+  .aurora::after {
+    content: ""; position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(100deg, #fff 0%, #fff 5%, transparent 8%, transparent 11%, #fff 15%),
+      repeating-linear-gradient(100deg, var(--blue-500) 10%, var(--indigo-300) 15%, var(--blue-300) 20%, var(--violet-200) 25%, var(--blue-400) 30%);
+    background-size: 200% 100%; background-attachment: fixed;
+    animation: aurora 45s linear infinite; mix-blend-mode: difference;
+  }
+
+  @keyframes aurora {
+    from { background-position: 50% 50%, 50% 50%; }
+    to   { background-position: 350% 50%, 350% 50%; }
+  }
+
+  /* ── Nav ─────────────────────────────── */
+  nav {
+    position: relative; z-index: 10;
+    padding: 16px 32px;
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  nav a { text-decoration: none; display: flex; align-items: center; }
+
+  .nav-logo {
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .nav-logo img {
+    height: 28px;
+    mix-blend-mode: multiply;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.06));
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+
+  .nav-logo span {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #2c2417;
+    letter-spacing: 0.3px;
+  }
+
+  nav .back {
+    font-size: 13px; font-weight: 400; color: var(--text-faint);
+    margin-left: auto; display: flex; align-items: center; gap: 4px;
+    transition: color 0.15s;
+  }
+  nav .back:hover { color: var(--text-muted); }
+  nav .back svg { width: 14px; height: 14px; }
+
+  /* ── Content ─────────────────────────── */
+  .content {
+    position: relative; z-index: 1;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 16px 24px 80px;
+    animation: appear-up 0.6s ease-out;
+  }
+
+  @keyframes appear-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .content h1 {
+    font-size: 24px; font-weight: 600;
+    letter-spacing: -0.02em; margin-bottom: 4px;
+  }
+
+  .subtitle {
+    font-size: 13px; color: var(--text-faint);
+    margin-bottom: 32px;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+  }
+
+  .card h2 {
+    font-size: 15px; font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-top: 28px; margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .card h2:first-child { margin-top: 0; }
+
+  .card p, .card li {
+    font-size: 14px; color: var(--text-muted);
+    line-height: 1.75;
+  }
+
+  .card p { margin-bottom: 10px; }
+
+  .card ul {
+    list-style: none; padding-left: 0; margin-bottom: 10px;
+  }
+
+  .card ul li {
+    position: relative; padding-left: 16px; margin-bottom: 4px;
+  }
+
+  .card ul li::before {
+    content: ""; position: absolute; left: 0; top: 9px;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--text-faint);
+  }
+
+  .card strong {
+    font-weight: 500; color: var(--text);
+  }
+
+  .card .highlight {
+    background: hsl(var(--brand) / 0.06);
+    border-left: 3px solid hsl(var(--brand));
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin: 12px 0;
+    font-size: 14px; color: var(--text-muted); line-height: 1.7;
+  }
+
+  .card code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    background: hsl(var(--brand) / 0.06);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--text);
+  }
+
+  .pipeline {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 12px 0;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--text-muted);
+    overflow-x: auto;
+  }
+
+  .risk-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 13px;
+  }
+
+  .risk-table th {
+    text-align: left;
+    padding: 8px 12px;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-faint);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .risk-table td {
+    padding: 8px 12px;
+    color: var(--text-muted);
+    border-bottom: 1px solid hsl(0 0% 0% / 0.04);
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .badge.critical { background: #fef2f2; color: #dc2626; }
+  .badge.high { background: #fff7ed; color: #ea580c; }
+  .badge.medium { background: #fefce8; color: #ca8a04; }
+  .badge.safe { background: #f0fdf4; color: #16a34a; }
+
+  .card a {
+    color: hsl(var(--brand));
+    text-decoration: none;
+  }
+  .card a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="aurora-wrapper">
+  <div class="aurora"></div>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo"><img src="angel_logo2.png" alt="AngelCare"><span>AngelCare</span></a>
+  <a href="index.html" class="back">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
+    Home
+  </a>
+</nav>
+
+<div class="content">
+  <h1>How AngelCare Works</h1>
+  <p class="subtitle">Technical overview</p>
+
+  <div class="card">
+    <h2>The Problem</h2>
+    <p>Over <strong>16 million</strong> Americans aged 65+ live alone (<a href="https://www.census.gov/library/stories/2024/05/living-arrangements.html">U.S. Census Bureau, 2024</a>). Each year, over <strong>3 million</strong> older adults are treated in emergency departments for fall-related injuries (<a href="https://www.cdc.gov/falls/data-research/facts-stats/index.html">CDC, Facts About Falls</a>).</p>
+    <p>When someone falls and cannot get up, this is called a <strong>"long lie."</strong> Research shows that prolonged time on the floor dramatically worsens outcomes &mdash; the time between a fall and getting help is one of the strongest predictors of recovery (<a href="https://www.sciencedirect.com/science/article/abs/pii/S1755599X22000052">Simpson et al., 2022</a>).</p>
+    <p>Existing solutions require wearables that can be expensive or run out of battery. Camera-based monitoring typically relies on rigid pose estimation that breaks in real-world home environments.</p>
+
+    <h2>Video Language Model Approach</h2>
+    <p>AngelCare takes a fundamentally different approach: instead of hand-crafted pose estimation or motion heuristics, we use a <strong>video language model</strong> (VLM) that actually understands what is happening in a scene.</p>
+    <div class="highlight">The core model is <strong>NVIDIA Cosmos Reason 2</strong> (8B parameters) &mdash; a video-native transformer that reasons over temporal sequences of frames, not just single images.</div>
+    <p>Given a short video clip (5&ndash;10 seconds), the model produces a natural-language description of the elder's activity and a structured safety classification. No training data or fine-tuning is required &mdash; the model generalizes to new homes, camera angles, and people through <strong>zero-shot prompting</strong> alone.</p>
+
+    <h2>Pipeline</h2>
+    <div class="pipeline">
+      Camera feed &rarr; 5&ndash;10s clip extraction<br>
+      &nbsp;&nbsp;&rarr; Cosmos Reason 2 (VLM captioning)<br>
+      &nbsp;&nbsp;&rarr; Safety classification (8 classes)<br>
+      &nbsp;&nbsp;&rarr; Risk assessment &rarr; SMS alert
+    </div>
+    <p>For continuous monitoring, AngelCare integrates with <strong>NVIDIA VSS</strong> (Video Search &amp; Summarization), which handles livestream ingestion, chunking, and inference orchestration on a single GPU. VSS also runs <strong>Llama 3.1 8B</strong> for aggregating clip-level captions into periodic safety summaries.</p>
+
+    <h2>Classification System</h2>
+    <p>Each video clip is classified into one of 8 categories across 4 risk levels:</p>
+    <table class="risk-table">
+      <thead>
+        <tr><th>Risk Level</th><th>Classes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="badge critical">CRITICAL</span></td><td>Fall Detected</td></tr>
+        <tr><td><span class="badge high">HIGH</span></td><td>Immobility Alert, Distress Posture</td></tr>
+        <tr><td><span class="badge medium">MEDIUM</span></td><td>Unsteady Movement</td></tr>
+        <tr><td><span class="badge safe">SAFE</span></td><td>Normal Walking, Normal Sitting, Normal Daily Activity, Resting or Sleeping</td></tr>
+      </tbody>
+    </table>
+    <p>CRITICAL and HIGH events trigger immediate SMS alerts to caregivers via Twilio with recommended actions. CRITICAL events can also notify emergency services if enabled.</p>
+
+    <h2>Infrastructure</h2>
+    <ul>
+      <li><strong>Model:</strong> NVIDIA Cosmos-Reason2-8B (video language model)</li>
+      <li><strong>Inference:</strong> NVIDIA VSS (Docker Compose) or HuggingFace Transformers (standalone)</li>
+      <li><strong>Summarization:</strong> Llama 3.1 8B via NIM</li>
+      <li><strong>Alerts:</strong> Twilio SMS for CRITICAL/HIGH risk events</li>
+      <li><strong>Compute:</strong> Single GPU &mdash; H100/A100 (80 GB) for VSS, or L40S (24 GB) for standalone inference</li>
+    </ul>
+
+    <h2>Why a VLM?</h2>
+    <p>Traditional fall detection uses skeleton estimation (e.g., OpenPose, MediaPipe) to track joint positions and detect falls via pose heuristics. These approaches fail when:</p>
+    <ul>
+      <li>The person is partially occluded (behind furniture, under blankets)</li>
+      <li>Lighting is poor or inconsistent</li>
+      <li>The camera angle is unusual (wall-mounted, elevated)</li>
+      <li>The fall is atypical (slow collapse vs. sudden drop)</li>
+    </ul>
+    <p>A video language model processes the entire scene holistically &mdash; it understands context (is the person reaching for something? are they in bed?), temporal patterns (did they get up after lying down?), and semantic meaning (is this a nap or prolonged immobility?). This produces significantly fewer false alarms and catches subtle risks that skeleton-based systems miss.</p>
+
+    <h2>Roadmap</h2>
+    <ul>
+      <li>Multi-camera support with room-aware context</li>
+      <li>Fine-tuning with TRL SFT for higher accuracy on edge cases</li>
+      <li>Edge deployment on NVIDIA Jetson for fully local processing</li>
+      <li>Wearable sensor fusion (heart rate, steps, sleep) to enrich video analysis</li>
+    </ul>
+
+    <h2>Datasets</h2>
+    <p>Evaluation clips sourced from:</p>
+    <ul>
+      <li><a href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/75QPKK">Harvard Dataverse &mdash; Fall Detection Dataset (DVN/75QPKK)</a></li>
+      <li><a href="https://github.com/ekramalam/GMDCSA24-A-Dataset-for-Human-Fall-Detection-in-Videos">GMDCSA24 &mdash; Human Fall Detection in Videos</a></li>
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>

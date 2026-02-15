@@ -1,0 +1,27 @@
+# Environment
+.env
+__pycache__/
+*.pyc
+.DS_Store
+.pytest_cache/
+.claude/
+
+# Runtime
+captures/
+uploads/
+angelcare_results*.json
+
+# Training data (large — stays local)
+training_dataset/FPDS_fall/
+training_dataset/gmdc/
+training_dataset/another/
+training_dataset/outputs/
+training_dataset/*.json
+
+# Videos (large — stays local)
+/videos/
+videos_compressed/
+
+# Misc
+Screenshot*
+*.png.tmp

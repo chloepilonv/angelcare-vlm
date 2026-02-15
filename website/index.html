@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AngelCare</title>
+<script>if(sessionStorage.getItem('angelcare_auth')!=='ok')window.location.href='login.html';</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafbff;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --text-faint: #94a3b8;
+    --border: #e2e8f0;
+    --card-bg: #ffffff;
+    --brand: 220 80% 58%;
+
+    /* Aurora palette */
+    --blue-300: #93c5fd;
+    --blue-400: #60a5fa;
+    --blue-500: #3b82f6;
+    --indigo-300: #a5b4fc;
+    --violet-200: #ddd6fe;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Aurora Background ─────────────── */
+  .aurora-wrapper {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .aurora {
+    position: absolute;
+    inset: -10px;
+    opacity: 0.55;
+    filter: blur(10px);
+    background-image:
+      repeating-linear-gradient(
+        100deg, #fff 0%, #fff 5%, transparent 8%, transparent 11%, #fff 15%
+      ),
+      repeating-linear-gradient(
+        100deg,
+        var(--blue-500) 10%,
+        var(--indigo-300) 15%,
+        var(--blue-300) 20%,
+        var(--violet-200) 25%,
+        var(--blue-400) 30%
+      );
+    background-size: 300% 200%;
+    background-position: 50% 50%;
+    animation: aurora 45s linear infinite;
+    mask-image: radial-gradient(ellipse at 50% 40%, black 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at 50% 40%, black 20%, transparent 75%);
+  }
+
+  .aurora::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(
+        100deg, #fff 0%, #fff 7%, transparent 10%, transparent 12%, #fff 16%
+      ),
+      repeating-linear-gradient(
+        100deg,
+        var(--blue-500) 10%,
+        var(--indigo-300) 15%,
+        var(--blue-300) 20%,
+        var(--violet-200) 25%,
+        var(--blue-400) 30%
+      );
+    background-size: 200% 100%;
+    background-attachment: fixed;
+    animation: aurora 60s linear infinite;
+    mix-blend-mode: difference;
+  }
+
+  @keyframes aurora {
+    from { background-position: 50% 50%, 50% 50%; }
+    to   { background-position: 350% 50%, 350% 50%; }
+  }
+
+  /* ── Layout ────────────────────────── */
+  .page {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+  }
+
+  /* ── Hero ──────────────────────────── */
+  .hero {
+    text-align: center;
+    max-width: 560px;
+    animation: appear-up 0.8s ease-out;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 56px 48px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.03);
+    position: relative;
+    z-index: 2;
+  }
+
+  @media (max-width: 600px) {
+    .hero { padding: 40px 24px; }
+  }
+
+  @keyframes appear-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .logo-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 24px;
+    gap: 6px;
+  }
+
+  .logo-icon {
+    height: 64px;
+    mix-blend-mode: multiply;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.08));
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .logo-text {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #2c2417;
+    letter-spacing: 0.5px;
+  }
+
+  .tagline {
+    font-size: 32px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  .tagline em {
+    font-style: normal;
+    color: hsl(var(--brand));
+  }
+
+  .description {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: hsl(var(--brand));
+    color: #fff;
+    text-decoration: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px hsl(var(--brand) / 0.2), 0 4px 16px hsl(var(--brand) / 0.15);
+  }
+
+  .cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px hsl(var(--brand) / 0.25), 0 8px 24px hsl(var(--brand) / 0.2);
+  }
+
+  .cta svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s;
+  }
+
+  .cta:hover svg {
+    transform: translateX(2px);
+  }
+
+  /* ── Features ──────────────────────── */
+  .features {
+    display: flex;
+    gap: 16px;
+    margin-top: 48px;
+    animation: appear-up 0.8s ease-out 0.2s both;
+    max-width: 900px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .feature {
+    flex: 1 1 180px;
+    min-width: 180px;
+    max-width: 220px;
+    padding: 24px 20px;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+
+  .feature:hover {
+    border-color: hsl(var(--brand) / 0.2);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    transform: translateY(-2px);
+  }
+
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: hsl(var(--brand) / 0.06);
+    border-radius: 10px;
+    color: hsl(var(--brand));
+  }
+
+  .feature-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .feature-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: 6px;
+  }
+
+  .feature-sub {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* ── Footer ────────────────────────── */
+  footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    padding: 16px;
+    font-size: 13px;
+    color: var(--text-faint);
+    z-index: 1;
+  }
+
+  footer a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  footer a:hover { color: hsl(var(--brand)); }
+
+  @media (max-width: 600px) {
+    .tagline { font-size: 24px; }
+    .features { flex-direction: column; align-items: center; }
+    .feature { width: 100%; max-width: 280px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="aurora-wrapper">
+  <div class="aurora"></div>
+</div>
+
+<div class="page">
+  <div class="hero">
+    <div class="logo-group">
+      <img src="angel_logo2.png" alt="AngelCare" class="logo-icon">
+      <span class="logo-text">AngelCare</span>
+    </div>
+    <h1 class="tagline">Watching over our loved ones.</h1>
+    <p class="description">
+      AI-powered safety monitoring for loved ones living independently.
+      Detects falls, distress, immobility and more from standard home cameras &mdash; no wearables required.
+    </p>
+    <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
+      <a href="examples.html" class="cta">
+        Test Videos
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+      </a>
+      <a href="livestream.html" class="cta" style="background:linear-gradient(135deg,#ef4444,#f97316);">
+        Livestream
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12c1.292 4.338 5.31 7.5 10.066 7.5.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
+      </div>
+      <div class="feature-label">Privacy Mode</div>
+      <div class="feature-sub">Video feed is blurred when no risk is detected. Only critical moments are visible &mdash; your loved one's daily privacy stays protected.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
+      </div>
+      <div class="feature-label">Smart Logs</div>
+      <div class="feature-sub">Receive activity summaries every hour, daily, or only on alerts. Delivered straight to your phone via SMS &mdash; stay informed without watching.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+      </div>
+      <div class="feature-label">Custom Behavior</div>
+      <div class="feature-sub">Fine-tune the model to your loved one's routines. AngelCare learns what's normal for them &mdash; reducing false alarms and catching real risks.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-2.25-1.313M21 7.5v2.25m0-2.25l-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3l2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75l2.25-1.313M12 21.75V19.5m0 2.25l-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25" /></svg>
+      </div>
+      <div class="feature-label">Wearable Sync</div>
+      <div class="feature-sub">Sync data from wearables and health sensors to enrich the video analysis. Heart rate, step count, and sleep metrics add context &mdash; better accuracy, fewer false alarms.</div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <a href="about.html">About</a> &middot; <a href="privacy.html">Privacy Policy</a>
+</footer>
+
+</body>
+</html>

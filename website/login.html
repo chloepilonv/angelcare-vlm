@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AngelCare — Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand: 220 80% 58%;
+    --bg: #fafbff;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --text-faint: #94a3b8;
+    --border: #e2e8f0;
+    --blue-300: #93c5fd;
+    --blue-400: #60a5fa;
+    --blue-500: #3b82f6;
+    --indigo-300: #a5b4fc;
+    --violet-200: #ddd6fe;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .aurora-wrapper {
+    position: fixed; inset: 0; overflow: hidden;
+    pointer-events: none; z-index: 0;
+  }
+
+  .aurora {
+    position: absolute; inset: -10px;
+    opacity: 0.55; filter: blur(10px);
+    background-image:
+      repeating-linear-gradient(100deg, #fff 0%, #fff 5%, transparent 8%, transparent 11%, #fff 15%),
+      repeating-linear-gradient(100deg, var(--blue-500) 10%, var(--indigo-300) 15%, var(--blue-300) 20%, var(--violet-200) 25%, var(--blue-400) 30%);
+    background-size: 300% 200%;
+    animation: aurora 45s linear infinite;
+    mask-image: radial-gradient(ellipse at 50% 40%, black 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at 50% 40%, black 20%, transparent 75%);
+  }
+
+  .aurora::after {
+    content: ""; position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(100deg, #fff 0%, #fff 7%, transparent 10%, transparent 12%, #fff 16%),
+      repeating-linear-gradient(100deg, var(--blue-500) 10%, var(--indigo-300) 15%, var(--blue-300) 20%, var(--violet-200) 25%, var(--blue-400) 30%);
+    background-size: 200% 100%; background-attachment: fixed;
+    animation: aurora 60s linear infinite; mix-blend-mode: difference;
+  }
+
+  @keyframes aurora {
+    from { background-position: 50% 50%, 50% 50%; }
+    to   { background-position: 350% 50%, 350% 50%; }
+  }
+
+  .page {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px 24px;
+  }
+
+  .login-card {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.03);
+    animation: appear-up 0.8s ease-out;
+    text-align: center;
+  }
+
+  @keyframes appear-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .logo-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 24px;
+    gap: 4px;
+  }
+
+  .logo-icon {
+    height: 56px;
+    mix-blend-mode: multiply;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.08));
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .logo-text {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #2c2417;
+    letter-spacing: 0.5px;
+  }
+
+  .login-card h1 {
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+
+  .login-card p {
+    font-size: 14px;
+    color: var(--text-faint);
+    margin-bottom: 28px;
+  }
+
+  .field {
+    text-align: left;
+    margin-bottom: 16px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-faint);
+    margin-bottom: 6px;
+  }
+
+  .field input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--text);
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .field input:focus {
+    border-color: hsl(var(--brand) / 0.5);
+    box-shadow: 0 0 0 3px hsl(var(--brand) / 0.08);
+  }
+
+  .error-msg {
+    font-size: 13px;
+    color: #dc2626;
+    margin-bottom: 16px;
+    min-height: 20px;
+  }
+
+  .login-btn {
+    width: 100%;
+    padding: 11px 24px;
+    background: hsl(var(--brand));
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px hsl(var(--brand) / 0.2), 0 4px 16px hsl(var(--brand) / 0.15);
+  }
+
+  .login-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px hsl(var(--brand) / 0.25), 0 8px 24px hsl(var(--brand) / 0.2);
+  }
+
+  @media (max-width: 600px) {
+    .login-card { padding: 36px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="aurora-wrapper">
+  <div class="aurora"></div>
+</div>
+
+<div class="page">
+  <div class="login-card">
+    <div class="logo-group">
+      <img src="angel_logo2.png" alt="AngelCare" class="logo-icon">
+      <span class="logo-text">AngelCare</span>
+    </div>
+    <h1>Welcome</h1>
+    <p>Enter your credentials to continue.</p>
+
+    <form id="loginForm" onsubmit="return handleLogin(event)">
+      <div class="field">
+        <label>Username</label>
+        <input type="text" id="username" autocomplete="username" autofocus required>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="password" autocomplete="current-password" required>
+      </div>
+      <div class="error-msg" id="errorMsg"></div>
+      <button type="submit" class="login-btn">Sign in</button>
+    </form>
+  </div>
+</div>
+
+<script>
+// Check if already authenticated
+if (sessionStorage.getItem('angelcare_auth') === 'ok') {
+  window.location.href = 'index.html';
+}
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function handleLogin(e) {
+  e.preventDefault();
+  const u = document.getElementById('username').value;
+  const p = document.getElementById('password').value;
+  const hash = await sha256(u + ':' + p);
+
+  // SHA-256 of valid credentials
+  if (hash === '788e89c357045234207ac396cd0050e7822d2a001121b098f04cd47c242efa51') {
+    sessionStorage.setItem('angelcare_auth', 'ok');
+    window.location.href = 'index.html';
+  } else {
+    document.getElementById('errorMsg').textContent = 'Invalid credentials';
+    document.getElementById('password').value = '';
+    document.getElementById('password').focus();
+  }
+  return false;
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch
+torchvision
+transformers>=4.57.0
+qwen-vl-utils
+accelerate
+huggingface_hub
+decord
+# Post-training (SFT)
+trl
+peft
+bitsandbytes
+fiftyone
+flask
+flask-cors
+requests
+twilio
+python-dotenv
+# Nemotron VL (cascade mode)
+causal_conv1d
+mamba-ssm>=2.3.0
+open_clip_torch
+timm

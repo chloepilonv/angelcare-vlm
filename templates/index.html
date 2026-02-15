@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AngelCare — Elder Safety Monitor</title>
+<style>
+  :root {
+    --blue: #1A3FB5;
+    --blue-light: #EBF0FF;
+    --blue-dark: #0F2980;
+    --critical: #DC2626;
+    --high: #EA580C;
+    --medium: #CA8A04;
+    --safe: #16A34A;
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-400: #9CA3AF;
+    --gray-600: #4B5563;
+    --gray-800: #1F2937;
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-800);
+    min-height: 100vh;
+  }
+
+  /* ── Header ─────────────────────────────── */
+  header {
+    background: white;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  header img {
+    height: 36px;
+  }
+
+  header .tagline {
+    color: var(--gray-400);
+    font-size: 14px;
+    border-left: 1px solid var(--gray-200);
+    padding-left: 16px;
+  }
+
+  /* ── Main ──────────────────────────────── */
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+
+  /* ── Upload ────────────────────────────── */
+  .upload-zone {
+    border: 2px dashed var(--gray-200);
+    border-radius: var(--radius);
+    padding: 32px;
+    text-align: center;
+    background: white;
+    margin-bottom: 32px;
+    transition: border-color 0.2s, background 0.2s;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .upload-zone.dragover {
+    border-color: var(--blue);
+    background: var(--blue-light);
+  }
+
+  .upload-zone.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .upload-zone h3 {
+    color: var(--blue);
+    margin-bottom: 4px;
+  }
+
+  .upload-zone p {
+    color: var(--gray-400);
+    font-size: 14px;
+  }
+
+  .upload-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .upload-zone.disabled input[type="file"] {
+    pointer-events: none;
+  }
+
+  /* ── Loading spinner ───────────────────── */
+  .analyzing {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 24px;
+    background: var(--blue-light);
+    border-radius: var(--radius);
+    margin-bottom: 32px;
+    color: var(--blue);
+    font-weight: 500;
+  }
+
+  .analyzing.active { display: flex; }
+
+  .spinner {
+    width: 20px; height: 20px;
+    border: 3px solid var(--blue-light);
+    border-top-color: var(--blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Results grid ──────────────────────── */
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--gray-800);
+  }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(520px, 1fr));
+    gap: 20px;
+  }
+
+  /* ── Card ──────────────────────────────── */
+  .card {
+    background: white;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--gray-200);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card video {
+    width: 100%;
+    max-height: 300px;
+    background: black;
+    display: block;
+  }
+
+  .card-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .card-filename {
+    font-size: 13px;
+    color: var(--gray-400);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  .badge-CRITICAL { background: #FEE2E2; color: var(--critical); }
+  .badge-HIGH     { background: #FFEDD5; color: var(--high); }
+  .badge-MEDIUM   { background: #FEF9C3; color: var(--medium); }
+  .badge-SAFE     { background: #DCFCE7; color: var(--safe); }
+  .badge-UNKNOWN  { background: var(--gray-100); color: var(--gray-600); }
+
+  .prediction-label {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .description {
+    font-size: 14px;
+    color: var(--gray-600);
+    line-height: 1.5;
+  }
+
+  .action {
+    font-size: 13px;
+    padding: 8px 12px;
+    background: #FEF2F2;
+    border-radius: 8px;
+    color: var(--critical);
+    font-weight: 500;
+  }
+
+  .action.safe {
+    background: #F0FDF4;
+    color: var(--safe);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--gray-400);
+  }
+
+  .empty-state h3 { margin-bottom: 8px; color: var(--gray-600); }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="/static/logo.png" alt="AngelCare">
+  <span class="tagline">Elder Safety Monitor</span>
+</header>
+
+<main>
+  <!-- Upload -->
+  <div class="upload-zone {{ 'disabled' if not model_loaded }}" id="uploadZone">
+    <h3>Upload a Video for Analysis</h3>
+    {% if model_loaded %}
+    <p>Drag & drop a video file here, or click to browse</p>
+    {% else %}
+    <p>Model not loaded — viewing pre-computed results only</p>
+    {% endif %}
+    {% if model_loaded %}
+    <input type="file" accept="video/*" id="fileInput">
+    {% endif %}
+  </div>
+
+  <div class="analyzing" id="analyzingBar">
+    <div class="spinner"></div>
+    <span>Analyzing video with Cosmos Reason 2...</span>
+  </div>
+
+  <!-- Results -->
+  <h2 class="section-title">Analysis Results</h2>
+
+  {% if results %}
+  <div class="results-grid" id="resultsGrid">
+    {% for r in results %}
+    <div class="card">
+      <video controls preload="metadata">
+        {% if r.source == 'upload' %}
+        <source src="/{{ r.file }}" type="video/mp4">
+        {% else %}
+        <source src="/videos/{{ r.file }}" type="video/mp4">
+        {% endif %}
+      </video>
+      <div class="card-body">
+        <div class="card-header">
+          <span class="card-filename">{{ r.file }}</span>
+          <span class="badge badge-{{ r.get('risk_level', 'UNKNOWN') }}">
+            {{ r.get('risk_level', '?') }}
+          </span>
+        </div>
+        <div class="prediction-label">{{ r.get('prediction_label', 'Unknown') }}</div>
+        {% if r.get('video_description') %}
+        <div class="description">{{ r.video_description }}</div>
+        {% endif %}
+        {% set action = r.get('risk_assessment', {}).get('recommended_action', '') %}
+        {% if action %}
+        <div class="action {{ 'safe' if r.get('risk_level') == 'SAFE' else '' }}">
+          {{ action }}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state" id="emptyState">
+    <h3>No results yet</h3>
+    <p>Run inference with <code>python angelcare_inference.py --video-dir videos/</code> or upload a video above.</p>
+  </div>
+  {% endif %}
+</main>
+
+<script>
+const zone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+const bar = document.getElementById('analyzingBar');
+
+if (fileInput) {
+  // Drag-and-drop styling
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    if (e.dataTransfer.files.length) {
+      uploadFile(e.dataTransfer.files[0]);
+    }
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) uploadFile(fileInput.files[0]);
+  });
+}
+
+async function uploadFile(file) {
+  bar.classList.add('active');
+  zone.classList.add('disabled');
+
+  const form = new FormData();
+  form.append('video', file);
+
+  try {
+    const resp = await fetch('/api/analyze', { method: 'POST', body: form });
+    const data = await resp.json();
+
+    if (data.error) {
+      alert('Error: ' + data.error);
+    } else {
+      // Remove empty state if present
+      const empty = document.getElementById('emptyState');
+      if (empty) empty.remove();
+
+      // Ensure grid exists
+      let grid = document.getElementById('resultsGrid');
+      if (!grid) {
+        grid = document.createElement('div');
+        grid.id = 'resultsGrid';
+        grid.className = 'results-grid';
+        document.querySelector('.section-title').after(grid);
+      }
+
+      // Build card
+      const risk = data.risk_level || 'UNKNOWN';
+      const action = (data.risk_assessment || {}).recommended_action || '';
+      const actionClass = risk === 'SAFE' ? 'safe' : '';
+
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <video controls preload="metadata">
+          <source src="/uploads/${file.name}" type="video/mp4">
+        </video>
+        <div class="card-body">
+          <div class="card-header">
+            <span class="card-filename">uploads/${file.name}</span>
+            <span class="badge badge-${risk}">${risk}</span>
+          </div>
+          <div class="prediction-label">${data.prediction_label || 'Unknown'}</div>
+          ${data.video_description ? `<div class="description">${data.video_description}</div>` : ''}
+          ${action ? `<div class="action ${actionClass}">${action}</div>` : ''}
+        </div>
+      `;
+      grid.prepend(card);
+    }
+  } catch (err) {
+    alert('Upload failed: ' + err.message);
+  }
+
+  bar.classList.remove('active');
+  zone.classList.remove('disabled');
+  if (fileInput) fileInput.value = '';
+}
+</script>
+
+</body>
+</html>

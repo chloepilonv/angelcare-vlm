@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AngelCare — Examples</title>
+<script>if(sessionStorage.getItem('angelcare_auth')!=='ok')window.location.href='login.html';</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand: 220 80% 58%;
+    --bg: #fafbff;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --text-faint: #94a3b8;
+    --border: #e2e8f0;
+    --card-bg: #ffffff;
+    --critical: #dc2626;
+    --critical-bg: #fef2f2;
+    --high: #ea580c;
+    --high-bg: #fff7ed;
+    --medium: #ca8a04;
+    --medium-bg: #fefce8;
+    --safe: #16a34a;
+    --safe-bg: #f0fdf4;
+    --radius: 12px;
+    --blue-300: #93c5fd;
+    --blue-400: #60a5fa;
+    --blue-500: #3b82f6;
+    --indigo-300: #a5b4fc;
+    --violet-200: #ddd6fe;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Aurora ──────────────────────────── */
+  .aurora-wrapper {
+    position: fixed; inset: 0; overflow: hidden;
+    pointer-events: none; z-index: 0;
+  }
+
+  .aurora {
+    position: absolute; inset: -10px;
+    opacity: 0.45; filter: blur(10px);
+    background-image:
+      repeating-linear-gradient(100deg, #fff 0%, #fff 5%, transparent 8%, transparent 11%, #fff 15%),
+      repeating-linear-gradient(100deg, var(--blue-500) 10%, var(--indigo-300) 15%, var(--blue-300) 20%, var(--violet-200) 25%, var(--blue-400) 30%);
+    background-size: 300% 200%;
+    animation: aurora 45s linear infinite;
+    mask-image: radial-gradient(ellipse at 50% 20%, black 15%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse at 50% 20%, black 15%, transparent 70%);
+  }
+
+  .aurora::after {
+    content: ""; position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(100deg, #fff 0%, #fff 7%, transparent 10%, transparent 12%, #fff 16%),
+      repeating-linear-gradient(100deg, var(--blue-500) 10%, var(--indigo-300) 15%, var(--blue-300) 20%, var(--violet-200) 25%, var(--blue-400) 30%);
+    background-size: 200% 100%; background-attachment: fixed;
+    animation: aurora 60s linear infinite; mix-blend-mode: difference;
+  }
+
+  @keyframes aurora {
+    from { background-position: 50% 50%, 50% 50%; }
+    to   { background-position: 350% 50%, 350% 50%; }
+  }
+
+  /* ── Nav ─────────────────────────────── */
+  nav {
+    position: relative; z-index: 10;
+    padding: 16px 32px;
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  nav a { text-decoration: none; display: flex; align-items: center; }
+
+  .nav-logo {
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .nav-logo img {
+    height: 28px;
+    mix-blend-mode: multiply;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.06));
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+
+  .nav-logo span {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #2c2417;
+    letter-spacing: 0.3px;
+  }
+
+  nav .back {
+    font-size: 13px; font-weight: 400; color: var(--text-faint);
+    margin-left: auto; display: flex; align-items: center; gap: 4px;
+    transition: color 0.15s;
+  }
+  nav .back:hover { color: var(--text-muted); }
+  nav .back svg { width: 14px; height: 14px; }
+
+  /* ── Dashboard layout ────────────────── */
+  .dashboard {
+    position: relative; z-index: 1;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 8px 32px 80px;
+    animation: appear-up 0.6s ease-out;
+  }
+
+  @keyframes appear-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Sidebar ─────────────────────────── */
+  .sidebar h1 {
+    font-size: 18px; font-weight: 600;
+    letter-spacing: -0.02em; margin-bottom: 4px;
+  }
+
+  .sidebar .subtitle {
+    font-size: 13px; color: var(--text-faint);
+    margin-bottom: 20px; line-height: 1.5;
+  }
+
+  .video-list {
+    display: flex; flex-direction: column; gap: 3px;
+  }
+
+  .video-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer; transition: all 0.15s;
+    font-family: inherit; font-size: 13px;
+    width: 100%; text-align: left;
+  }
+
+  .video-item:hover {
+    border-color: hsl(var(--brand) / 0.3);
+    background: rgba(255,255,255,0.9);
+  }
+
+  .video-item.active {
+    border-color: hsl(var(--brand) / 0.4);
+    background: hsl(var(--brand) / 0.04);
+    box-shadow: 0 0 0 1px hsl(var(--brand) / 0.1);
+  }
+
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  }
+
+  .dot-CRITICAL { background: var(--critical); box-shadow: 0 0 6px var(--critical); }
+  .dot-HIGH     { background: var(--high); box-shadow: 0 0 6px var(--high); }
+  .dot-MEDIUM   { background: var(--medium); }
+  .dot-SAFE     { background: var(--safe); }
+
+  .item-name { flex: 1; color: var(--text); font-weight: 400; }
+
+  .item-badge {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.4px; padding: 2px 6px; border-radius: 5px;
+  }
+
+  .item-badge-CRITICAL { background: var(--critical-bg); color: var(--critical); }
+  .item-badge-HIGH     { background: var(--high-bg); color: var(--high); }
+  .item-badge-MEDIUM   { background: var(--medium-bg); color: var(--medium); }
+  .item-badge-SAFE     { background: var(--safe-bg); color: var(--safe); }
+
+  /* ── Main panel ──────────────────────── */
+  .main-panel {
+    display: flex; flex-direction: column; gap: 20px;
+  }
+
+  /* Empty state */
+  .empty-state {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    min-height: 400px;
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(12px);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    color: var(--text-faint);
+    font-size: 14px; text-align: center;
+    gap: 8px;
+  }
+
+  .empty-state svg { width: 32px; height: 32px; opacity: 0.4; }
+
+  .empty-state.hidden { display: none; }
+
+  /* Video player */
+  .video-container {
+    display: none;
+    position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+  }
+
+  .video-container.visible { display: block; }
+
+  .video-container video {
+    width: 100%;
+    max-height: 380px;
+    object-fit: contain;
+    display: block;
+  }
+
+  /* ── Analysis card ───────────────────── */
+  .analysis-card {
+    display: none;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    animation: appear-up 0.4s ease-out;
+  }
+
+  .analysis-card.visible { display: block; }
+
+  .analysis-card-accent {
+    height: 3px; width: 100%;
+  }
+
+  .accent-CRITICAL { background: var(--critical); }
+  .accent-HIGH     { background: var(--high); }
+  .accent-MEDIUM   { background: var(--medium); }
+  .accent-SAFE     { background: var(--safe); }
+
+  .analysis-inner { padding: 24px; }
+
+  .analysis-top {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .analysis-top h2 {
+    font-size: 17px; font-weight: 600; letter-spacing: -0.01em;
+  }
+
+  .badge {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.5px; padding: 3px 8px; border-radius: 6px;
+  }
+
+  .badge-CRITICAL { background: var(--critical-bg); color: var(--critical); }
+  .badge-HIGH     { background: var(--high-bg); color: var(--high); }
+  .badge-MEDIUM   { background: var(--medium-bg); color: var(--medium); }
+  .badge-SAFE     { background: var(--safe-bg); color: var(--safe); }
+
+  .analysis-description {
+    font-size: 14px; color: var(--text-muted);
+    line-height: 1.7; margin-bottom: 20px;
+  }
+
+  .analysis-meta {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  }
+
+  .meta-item {
+    padding: 12px; background: var(--bg); border-radius: 8px;
+  }
+
+  .meta-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    color: var(--text-faint); margin-bottom: 4px;
+  }
+
+  .meta-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; font-weight: 500; color: var(--text);
+  }
+
+  .action-bar {
+    grid-column: 1 / -1;
+    padding: 12px; border-radius: 8px;
+  }
+
+  .action-bar.risk { background: var(--critical-bg); }
+  .action-bar.safe { background: var(--safe-bg); }
+  .action-bar .meta-value.risk { color: var(--critical); }
+  .action-bar .meta-value.safe { color: var(--safe); }
+
+  /* ── Footer ──────────────────────────── */
+  .powered-by {
+    text-align: center; font-size: 12px;
+    color: var(--text-faint); line-height: 1.6;
+    padding-top: 4px;
+  }
+
+  .powered-by strong { font-weight: 500; color: var(--text-muted); }
+
+  /* ── Pulse on critical/high dots ──────── */
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .dot-CRITICAL, .dot-HIGH {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* ── Responsive ──────────────────────── */
+  @media (max-width: 768px) {
+    .dashboard {
+      grid-template-columns: 1fr;
+      padding: 8px 16px 80px;
+    }
+    .video-list {
+      flex-direction: row; flex-wrap: wrap; gap: 6px;
+    }
+    .video-item { width: auto; flex: 1; min-width: 140px; }
+    .empty-state { min-height: 200px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="aurora-wrapper">
+  <div class="aurora"></div>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo"><img src="angel_logo2.png" alt="AngelCare"><span>AngelCare</span></a>
+  <a href="livestream.html" class="back" style="margin-left: auto; margin-right: 8px;">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+    Live
+  </a>
+  <a href="index.html" class="back">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
+    Home
+  </a>
+</nav>
+
+<div class="dashboard">
+  <div class="sidebar">
+    <h1>Test clips</h1>
+    <p class="subtitle">Select a clip to see AngelCare's analysis.</p>
+    <div class="video-list" id="videoList"></div>
+  </div>
+
+  <div class="main-panel">
+    <div class="empty-state" id="emptyState">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+      Select a video to begin
+    </div>
+
+    <div class="video-container" id="videoContainer">
+      <video id="videoPlayer" controls preload="metadata"></video>
+    </div>
+
+    <div class="analysis-card" id="analysisCard">
+      <div class="analysis-card-accent" id="cardAccent"></div>
+      <div class="analysis-inner">
+        <div class="analysis-top">
+          <h2 id="predictionLabel"></h2>
+          <span class="badge" id="riskTag"></span>
+        </div>
+        <p class="analysis-description" id="description"></p>
+
+        <div class="analysis-meta">
+          <div class="meta-item">
+            <div class="meta-label">Class ID</div>
+            <div class="meta-value" id="classId"></div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Risk Level</div>
+            <div class="meta-value" id="riskLevel"></div>
+          </div>
+          <div class="action-bar" id="actionBar">
+            <div class="meta-label">Recommended Action</div>
+            <div class="meta-value" id="action"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="powered-by" id="poweredBy" style="display:none">
+      Analyzed by <strong>NVIDIA Cosmos Reason 2 (8B)</strong> &mdash; zero-shot, no custom training.
+    </p>
+  </div>
+</div>
+
+<script>
+const RESULTS = [
+  {
+    file: "bad-1.mp4",
+    name: "Risk scenario 1",
+    prediction_class_id: 4,
+    prediction_label: "Normal Walking",
+    risk_level: "SAFE",
+    video_description: "The elderly person is walking steadily through the home with normal gait and balance, with no signs of distress or instability.",
+    risk_assessment: { recommended_action: "No action needed" }
+  },
+  {
+    file: "bad-2.mp4",
+    name: "Risk scenario 2",
+    prediction_class_id: 5,
+    prediction_label: "Normal Sitting",
+    risk_level: "SAFE",
+    video_description: "The elderly woman is seated on a chair, leaning slightly forward, and appears to be reading a book or magazine.",
+    risk_assessment: { recommended_action: "No action needed" }
+  },
+  {
+    file: "bad-3.mp4",
+    name: "Risk scenario 3",
+    prediction_class_id: 0,
+    prediction_label: "Fall Detected",
+    risk_level: "CRITICAL",
+    video_description: "An elderly person is lying on the floor, indicating a fall has occurred. There is no visible movement, indicating they may be unable to get up independently.",
+    risk_assessment: { recommended_action: "Call emergency services" }
+  },
+  {
+    file: "bad-4.mp4",
+    name: "Risk scenario 4",
+    prediction_class_id: 0,
+    prediction_label: "Fall Detected",
+    risk_level: "CRITICAL",
+    video_description: "The elderly person falls to the ground and remains lying down, unable to get up on their own. Immediate assistance is needed to prevent further injury.",
+    risk_assessment: { recommended_action: "Call emergency services" }
+  },
+  {
+    file: "good-1.mp4",
+    name: "Safe scenario 1",
+    prediction_class_id: 4,
+    prediction_label: "Normal Walking",
+    risk_level: "SAFE",
+    video_description: "The elderly person is walking steadily through the room, maintaining a consistent pace and posture without any signs of instability.",
+    risk_assessment: { recommended_action: "No action needed" }
+  },
+  {
+    file: "good-2.mp4",
+    name: "Safe scenario 2",
+    prediction_class_id: 6,
+    prediction_label: "Normal Daily Activity",
+    risk_level: "SAFE",
+    video_description: "The elderly person is sitting on a chair, holding and looking at a tablet. There is no indication of unusual movement or distress.",
+    risk_assessment: { recommended_action: "No action needed" }
+  },
+  {
+    file: "good-3.mp4",
+    name: "Safe scenario 3",
+    prediction_class_id: 6,
+    prediction_label: "Normal Daily Activity",
+    risk_level: "SAFE",
+    video_description: "The elderly person is engaged in a stretching routine, moving their arms and body in a controlled manner while standing. No signs of imbalance or distress.",
+    risk_assessment: { recommended_action: "No action needed" }
+  },
+  {
+    file: "good-4.mp4",
+    name: "Safe scenario 4",
+    prediction_class_id: 5,
+    prediction_label: "Normal Sitting",
+    risk_level: "SAFE",
+    video_description: "The elderly woman is sitting on a bench, holding a phone to her ear. She maintains a stable posture with minimal movement.",
+    risk_assessment: { recommended_action: "No action needed" }
+  },
+  {
+    file: "good-5.mp4",
+    name: "Safe scenario 5",
+    prediction_class_id: 6,
+    prediction_label: "Normal Daily Activity",
+    risk_level: "SAFE",
+    video_description: "An elderly person is standing in a home office, reaching up to adjust something on the wall cabinet. Movements are deliberate and controlled.",
+    risk_assessment: { recommended_action: "No action needed" }
+  }
+];
+
+const list = document.getElementById('videoList');
+const player = document.getElementById('videoPlayer');
+const videoContainer = document.getElementById('videoContainer');
+const analysisCard = document.getElementById('analysisCard');
+const emptyState = document.getElementById('emptyState');
+const poweredBy = document.getElementById('poweredBy');
+
+RESULTS.forEach((r, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'video-item';
+  btn.innerHTML = `
+    <span class="dot dot-${r.risk_level}"></span>
+    <span class="item-name">${r.name}</span>
+    <span class="item-badge item-badge-${r.risk_level}">${r.risk_level}</span>
+  `;
+  btn.onclick = () => selectVideo(i, btn);
+  list.appendChild(btn);
+});
+
+function selectVideo(index, btn) {
+  const r = RESULTS[index];
+
+  document.querySelectorAll('.video-item').forEach(el => el.classList.remove('active'));
+  btn.classList.add('active');
+
+  emptyState.classList.add('hidden');
+
+  player.src = `videos/${r.file}`;
+  player.load();
+  videoContainer.classList.add('visible');
+
+  document.getElementById('predictionLabel').textContent = r.prediction_label;
+  const tag = document.getElementById('riskTag');
+  tag.textContent = r.risk_level;
+  tag.className = `badge badge-${r.risk_level}`;
+
+  const accent = document.getElementById('cardAccent');
+  accent.className = `analysis-card-accent accent-${r.risk_level}`;
+
+  document.getElementById('description').textContent = r.video_description;
+  document.getElementById('classId').textContent = r.prediction_class_id;
+  document.getElementById('riskLevel').textContent = r.risk_level;
+
+  const isRisk = ['CRITICAL', 'HIGH', 'MEDIUM'].includes(r.risk_level);
+  const actionBar = document.getElementById('actionBar');
+  actionBar.className = `action-bar ${isRisk ? 'risk' : 'safe'}`;
+  const actionVal = document.getElementById('action');
+  actionVal.textContent = r.risk_assessment.recommended_action;
+  actionVal.className = `meta-value ${isRisk ? 'risk' : 'safe'}`;
+
+  analysisCard.classList.add('visible');
+  poweredBy.style.display = 'block';
+}
+</script>
+
+</body>
+</html>
