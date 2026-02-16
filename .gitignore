@@ -23,8 +23,7 @@ training_dataset/*.json
 videos_compressed/
 
 # Internal docs (keep local only)
-TECHNICAL.md
-DEPLOYMENT.md
+docs/
 
 # Misc
 Screenshot*

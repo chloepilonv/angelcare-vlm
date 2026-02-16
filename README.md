@@ -103,15 +103,24 @@ python -m core.inference --video-dir videos/ --model cascade
 
 ## Project Structure
 
+| Folder | What it contains |
+|--------|-----------------|
+| `core/` | AI model code — Cosmos Reason 2 inference, Nemotron VL inference, speculative cascade logic |
+| `server/` | Server infrastructure — RTSP camera capture, NVIDIA VSS client, Twilio SMS alerts |
+| `scripts/` | One-command deployment scripts for inference (Mac → H100) and training (Mac → A100) |
+| `deploy/` | VSS Docker Compose setup for the full NVIDIA Video Search & Summarization stack |
+| `website/` | Static frontend hosted on Vercel (dashboard, livestream, test videos) |
+| `training_dataset/` | Post-training pipeline — dataset preparation, evaluation, QLoRA SFT training ([guide](training_dataset/TRAINING.md)) |
+
 ```
-├── app.py                    # Flask web dashboard (entrypoint)
+├── app.py                    # Flask entrypoint
 ├── core/
-│   ├── inference.py          # Cosmos Reason 2 inference
-│   ├── nemotron.py           # Nemotron VL inference
+│   ├── inference.py          # Cosmos Reason 2 (8B) inference
+│   ├── nemotron.py           # Nemotron VL (12B) inference
 │   └── cascade.py            # Speculative cascade orchestrator
 ├── server/
-│   ├── camera.py             # RTSP camera capture
-│   ├── vss.py                # NVIDIA VSS client
+│   ├── camera.py             # RTSP camera capture (ffmpeg)
+│   ├── vss.py                # NVIDIA VSS API client
 │   └── alerts.py             # Twilio SMS alerts
 ├── scripts/
 │   ├── deploy.sh             # Mac → H100 (inference)
@@ -122,6 +131,7 @@ python -m core.inference --video-dir videos/ --model cascade
 │   └── setup_vss.sh          # VSS Docker Compose setup
 ├── website/                  # Static site (Vercel)
 ├── training_dataset/
+│   ├── TRAINING.md           # Post-training guide
 │   ├── prepare_llava_dataset.py
 │   ├── evaluate.py
 │   └── train.sh
