@@ -10,7 +10,7 @@ Based on the [Cosmos Cookbook Intelligent Transportation recipe](https://nvidia-
 bash scripts/deploy_training.sh <NEBIUS_IP> --push-to-hf
 ```
 
-This uploads data, installs deps, trains, evaluates, and pushes weights to HuggingFace — all in one command. See [DEPLOYMENT.md](../DEPLOYMENT.md) for details.
+This uploads data, installs deps, trains, evaluates, and pushes weights to HuggingFace — all in one command.
 
 The steps below are the manual equivalent for reference and debugging.
 
@@ -26,7 +26,7 @@ The steps below are the manual equivalent for reference and debugging.
 ## Step 1: Generate the Dataset (on your Mac)
 
 ```bash
-cd ~/Documents/CODE/MISC/angelcare/training_dataset
+cd training_dataset
 python3 prepare_llava_dataset.py
 ```
 
@@ -54,11 +54,11 @@ From your Mac:
 
 ```bash
 rsync -avz --progress \
-  ~/Documents/CODE/MISC/angelcare/training_dataset/ \
+  training_dataset/ \
   <SSH_USER>@<NEBIUS_IP>:~/angelcare/training_dataset/
 
 rsync -avz --progress \
-  ~/Documents/CODE/MISC/angelcare/videos_compressed/ \
+  videos_compressed/ \
   <SSH_USER>@<NEBIUS_IP>:~/angelcare/videos_compressed/
 ```
 
@@ -135,7 +135,7 @@ What happens:
 | Batch size | 1 (grad accum 8) | Effective batch 8, fits in memory |
 | Learning rate | 2e-5 | Standard for LoRA fine-tuning |
 
-See [TECHNICAL.md](../TECHNICAL.md#post-training-sft) for detailed justification of every parameter.
+Based on standard QLoRA best practices for small datasets.
 
 ## Step 8: Evaluate Fine-Tuned Model
 
@@ -185,7 +185,7 @@ The adapter weights are only ~87MB:
 ```bash
 # From your Mac
 scp -r <SSH_USER>@<NEBIUS_IP>:~/angelcare/training_dataset/outputs/angelcare_sft/final \
-  ~/Documents/CODE/MISC/angelcare/training_dataset/outputs/angelcare_sft/final
+  training_dataset/outputs/angelcare_sft/final
 ```
 
 ## Step 10: Shut Down
@@ -203,6 +203,23 @@ prepare_llava_dataset.py  →   rsync upload
                               eval fine-tuned (~30 min)
                               upload weights             →   your-username/your-model
                               shut down
+```
+
+## Training Datasets
+
+Download these datasets and place them in `training_dataset/`:
+
+| Dataset | Description | Download |
+|---------|------------|----------|
+| GMDCSA-24 | 160 videos (79 fall + 81 ADL) with CSV descriptions | [Mendeley Data](https://data.mendeley.com/datasets/kvv8x4cyzg) |
+| FPDS Fall | Fall detection video clips | [Harvard Dataverse](https://doi.org/10.7910/DVN/75QPKK) |
+
+Expected directory structure:
+```
+training_dataset/
+├── gmdc/           # GMDCSA-24 videos + CSV
+├── FPDS_fall/      # FPDS fall clips
+└── prepare_llava_dataset.py
 ```
 
 ## Citations
