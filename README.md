@@ -130,14 +130,6 @@ python -m core.inference --video-dir videos/ --model cascade
 
 ---
 
-## Documentation
-
-| Guide | What it covers |
-|-------|---------------|
-| [TECHNICAL.md](TECHNICAL.md) | Model choices, QLoRA config, cascade architecture, video processing, VSS |
-| [DEPLOYMENT.md](DEPLOYMENT.md) | Scripts, manual setup, camera config, tunnels, troubleshooting |
-| [TRAINING.md](training_dataset/TRAINING.md) | Post-training pipeline (QLoRA SFT, ~3 min on A100) |
-
 ## Privacy
 
 Video is processed in memory and discarded — no raw footage is stored. See [Privacy Policy](website/privacy.html).
