@@ -14,12 +14,10 @@ The server maintains a ring buffer of recent events for the livestream
 dashboard and automatically triggers SMS alerts for high-risk events.
 
 Usage:
-    source ~/cosmos-reason2/.venv/bin/activate
-    cd ~/angelcare
     python app.py                    # load model + serve web UI
     python app.py --no-model         # serve UI only (use pre-computed results)
     python app.py --vss-url http://localhost:8100   # enable VSS integration
-    python app.py --cascade                        # speculative cascade (both models)
+    python app.py --cascade          # speculative cascade (both models)
 """
 
 # Fix mamba_ssm / transformers compatibility (GreedySearchDecoderOnlyOutput removed in newer transformers)

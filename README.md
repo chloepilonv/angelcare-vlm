@@ -6,7 +6,7 @@ Uses video AI to detect falls, immobility, unsteady movement, and distress from 
 
 Built on [NVIDIA Cosmos Reason 2](https://huggingface.co/nvidia/Cosmos-Reason2-8B) with a [speculative cascade](https://arxiv.org/abs/2405.19261) to [NVIDIA Nemotron VL](https://huggingface.co/nvidia/NVIDIA-Nemotron-Nano-12B-v2-VL-BF16) for uncertain clips.
 
-**Live demo:** [angelcare.info](https://angelcare-system.vercel.app)
+**Live demo:** [angelcare.info](https://angelcare.info)
 
 ---
 

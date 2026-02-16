@@ -6,14 +6,11 @@ using the same approach as the Cosmos Cookbook Worker Safety recipe.
 
 Requirements:
     - NVIDIA GPU with 24GB+ VRAM
-    - Python environment from cosmos-reason2 repo (see setup_nebius.sh)
+    - pip install -r requirements.txt
     - HuggingFace auth token (for model download)
 
 Usage:
-    source ~/cosmos-reason2/.venv/bin/activate
     python -m core.inference --video path/to/video.mp4
-
-    # Or process videos/bad/ and videos/good/ together:
     python -m core.inference --video-dir videos/
 """
 
