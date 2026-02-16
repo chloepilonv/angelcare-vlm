@@ -2,7 +2,7 @@
 
 Step-by-step guide to fine-tune Cosmos Reason 2 (8B) on elder care fall detection data using QLoRA SFT on Nebius.
 
-Based on the [Cosmos Cookbook Intelligent Transportation recipe](https://nvidia-cosmos.github.io/cosmos-cookbook/recipes/post_training/reason2/intelligent-transportation/post_training.html).
+Based on the [Cosmos Cookbook post-training SFT recipe](https://nvidia-cosmos.github.io/cosmos-cookbook/core_concepts/post_training/overview.html) (adapted from the [Intelligent Transportation example](https://nvidia-cosmos.github.io/cosmos-cookbook/recipes/post_training/reason2/intelligent-transportation/post_training.html)).
 
 ## Quick Start (Automated)
 
@@ -212,13 +212,15 @@ Download these datasets and place them in `training_dataset/`:
 | Dataset | Description | Download |
 |---------|------------|----------|
 | GMDCSA-24 | 160 videos (79 fall + 81 ADL) with CSV descriptions | [Mendeley Data](https://data.mendeley.com/datasets/kvv8x4cyzg) |
-| FPDS Fall | Fall detection video clips | [Harvard Dataverse](https://doi.org/10.7910/DVN/75QPKK) |
+| FPDS Fall | Fall detection video clips (large — needs full SFT + [data curation](https://nvidia-cosmos.github.io/cosmos-cookbook/core_concepts/data_curation/overview.html)) | [Harvard Dataverse](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/75QPKK) |
+| Toyota Smarthome | Daily activities of elderly people (coming soon) | [INRIA](https://project.inria.fr/toyotasmarthome/) |
 
 Expected directory structure:
 ```
 training_dataset/
 ├── gmdc/           # GMDCSA-24 videos + CSV
 ├── FPDS_fall/      # FPDS fall clips
+├── another/        # Toyota Smarthome (when available)
 └── prepare_llava_dataset.py
 ```
 

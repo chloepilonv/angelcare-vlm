@@ -32,7 +32,7 @@ Open the dashboard → Livestream → paste Cloudflare tunnel URL → enter came
 | Flag | What it does |
 |------|-------------|
 | `--cascade` | Load both Cosmos (8B) + Nemotron VL (12B) |
-| `--with-vss` | Deploy full VSS stack (requires NGC_API_KEY) |
+| `--with-vss` | Deploy full [VSS](https://nvidia-cosmos.github.io/cosmos-cookbook/recipes/inference/reason2/vss/inference.html) stack (requires NGC_API_KEY) |
 | `--camera-ip IP` | Prints the exact SSH tunnel command for your camera |
 | `--port N` | Flask port (default 5000) |
 
@@ -129,6 +129,13 @@ python -m core.inference --video-dir videos/ --model cascade
 ```
 
 ---
+
+## References
+
+- [Cosmos Cookbook — Post-Training (SFT)](https://nvidia-cosmos.github.io/cosmos-cookbook/core_concepts/post_training/overview.html)
+- [Cosmos Cookbook — Data Curation](https://nvidia-cosmos.github.io/cosmos-cookbook/core_concepts/data_curation/overview.html)
+- [Cosmos Cookbook — VSS Inference](https://nvidia-cosmos.github.io/cosmos-cookbook/recipes/inference/reason2/vss/inference.html)
+- [Speculative Cascade (ICLR 2025)](https://arxiv.org/abs/2405.19261)
 
 ## Privacy
 

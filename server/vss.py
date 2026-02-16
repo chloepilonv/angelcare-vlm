@@ -2,6 +2,7 @@
 AngelCare — VSS API Client
 ============================
 Thin wrapper around the NVIDIA Video Search & Summarization REST API.
+See: https://nvidia-cosmos.github.io/cosmos-cookbook/recipes/inference/reason2/vss/inference.html
 
 This client provides a simple interface to the VSS service for uploading
 video files and running elder-safety analysis using Cosmos Reason 2.
